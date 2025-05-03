@@ -3,12 +3,15 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, Alert, SafeAreaVie
 import { Picker } from '@react-native-picker/picker';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '..';
+
+type NavigationProp = NativeStackNavigationProp<RootStackParamList, 'Metas'>;
 
 const WeeklyGoals = () => {
   const [exerciseType, setExerciseType] = useState('Push-up');
   const [repetitions, setRepetitions] = useState('');
-  
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp>();
 
   const handleSubmit = () => {
     if (!repetitions || isNaN(Number(repetitions))) {
@@ -16,12 +19,14 @@ const WeeklyGoals = () => {
       return;
     }
 
-    Alert.alert('Meta guardada', `Ejercicio: ${exerciseType}\nRepeticiones: ${repetitions}`);
+    const newGoal = `${exerciseType} - ${repetitions} repeticiones`;
+
+    // Navega de regreso al Home con la nueva meta
+    navigation.navigate('Home', { newGoal });
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Botón de regreso */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={28} color="white" />
@@ -31,7 +36,6 @@ const WeeklyGoals = () => {
       <View style={styles.content}>
         <Text style={styles.title}>Selecciona tus metas semanales</Text>
 
-        {/* Selección de tipo de ejercicio */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Tipo de ejercicio</Text>
           <View style={styles.pickerContainer}>
@@ -49,7 +53,6 @@ const WeeklyGoals = () => {
           </View>
         </View>
 
-        {/* Ingreso de repeticiones */}
         <View style={styles.inputGroup}>
           <Text style={styles.label}>Cantidad de repeticiones</Text>
           <TextInput
@@ -61,7 +64,6 @@ const WeeklyGoals = () => {
           />
         </View>
 
-        {/* Botón para guardar la meta */}
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
           <Text style={styles.buttonText}>Guardar meta</Text>
         </TouchableOpacity>
@@ -71,16 +73,8 @@ const WeeklyGoals = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  header: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },
+  container: { flex: 1, backgroundColor: '#f8f9fa' },
+  header: { position: 'absolute', top: 40, left: 20, zIndex: 10 },
   backButton: {
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 20,
@@ -98,10 +92,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     color: '#007bff',
   },
-  inputGroup: {
-    width: '100%',
-    marginBottom: 20,
-  },
+  inputGroup: { width: '100%', marginBottom: 20 },
   label: {
     fontSize: 16,
     fontWeight: '500',
@@ -115,10 +106,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     backgroundColor: '#fff',
   },
-  picker: {
-    height: 50,
-    width: '100%',
-  },
+  picker: { height: 50, width: '100%' },
   input: {
     height: 50,
     width: '100%',
@@ -136,11 +124,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  buttonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
 });
 
 export default WeeklyGoals;

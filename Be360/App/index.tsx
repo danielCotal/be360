@@ -9,7 +9,7 @@ import Registro from './Screens/register';
 
 export type RootStackParamList = {
   Login: undefined;
-  Home: undefined;
+  Home: { newGoal: string } | undefined;
   Settings: undefined;
   Metas: undefined;
   Registro: undefined;

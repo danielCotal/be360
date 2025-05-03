@@ -1,78 +1,71 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View, Text, StyleSheet, SafeAreaView, TouchableOpacity, ScrollView, Image
+} from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '..';
-
-// Si planeas usar algún gráfico, puedes usar librerías como react-native-chart-kit o react-native-svg
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
-const App = ({ navigation }: Props) => {
-  const [message, setMessage] = useState('Welcome to the Home Screen!');
+const Home = ({ navigation }: Props) => {
+  const route = useRoute<Props['route']>();
+  const [goals, setGoals] = useState<string[]>([]);
 
-  const handlePress = (newMessage: string) => {
-    setMessage(newMessage);
-  };
+  // Al navegar de vuelta a Home, agregar la nueva meta al estado
+  useEffect(() => {
+    if (route.params?.newGoal) {
+      setGoals((prevGoals) => [...prevGoals, route.params!.newGoal]);
+    }
+  }, [route.params?.newGoal]);
+
+  const images = [
+    require('../../assets/Images/img1.jpg'),
+    require('../../assets/Images/img2.jpg'),
+    require('../../assets/Images/img3.jpeg'),
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Top Bar */}
       <View style={styles.topBar}>
         <Text style={styles.topBarText}>Home</Text>
       </View>
 
-      {/* Main Scrollable Content */}
       <ScrollView style={styles.scrollContent}>
-        {/* Section for Images or Graphs */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gallery or Graphs</Text>
-          
-          {/* Example of displaying images */}
-          <ScrollView horizontal={true} style={styles.imageScroll}>
-            <Image
-              source={{ uri: 'https://via.placeholder.com/150' }} // Replace with your image URL
-              style={styles.image}
-            />
-            <Image
-              source={{ uri: 'https://via.placeholder.com/150' }} // Replace with your image URL
-              style={styles.image}
-            />
-            <Image
-              source={{ uri: 'https://via.placeholder.com/150' }} // Replace with your image URL
-              style={styles.image}
-            />
+          <Text style={styles.sectionTitle}>Galería</Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.imageScroll}
+            contentContainerStyle={styles.imageScrollContent}
+          >
+            {images.map((source, index) => (
+              <Image key={index} source={source} style={styles.largeImage} />
+            ))}
           </ScrollView>
-
-          {/* If you want to show a chart, you can add something like this (example with ChartKit) */}
-          {/* <LineChart
-            data={data} // Your chart data here
-            width={Dimensions.get('window').width - 20} // Responsiveness
-            height={220}
-            chartConfig={chartConfig}
-            style={styles.chart}
-          /> */}
         </View>
 
-        {/* Another Section with Content or Goals */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>More Content or Weekly Goals</Text>
-          <Text style={styles.sectionText}>Here you can add additional content or goals.</Text>
+          <Text style={styles.sectionTitle}>Metas Semanales</Text>
+          {goals.length === 0 ? (
+            <Text style={styles.sectionText}>No has añadido ninguna meta aún.</Text>
+          ) : (
+            <View style={styles.goalsList}>
+              {goals.map((goal, index) => (
+                <Text key={index} style={styles.goalItem}>• {goal}</Text>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
 
-      {/* Bottom Navigation Bar */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity
-          style={styles.bottomBarButton}
-          onPress={() => handlePress('aqui iran las opciones!')}
-        >
+        <TouchableOpacity style={styles.bottomBarButton}>
           <Text style={styles.bottomBarText}>Home</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.bottomBarButton}
-          onPress={() => handlePress('aqui iran las opciones de busqueda!')}
-        >
-          <Text style={styles.bottomBarText}>Search</Text>
+        <TouchableOpacity style={styles.bottomBarButton}>
+          <Text style={styles.bottomBarText}>Cursos</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.bottomBarButton}
@@ -82,7 +75,7 @@ const App = ({ navigation }: Props) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.bottomBarButton}
-          onPress={() => navigation.navigate('Metas')} // Navigate to Weekly Goals screen
+          onPress={() => navigation.navigate('Metas')}
         >
           <Text style={styles.bottomBarText}>Metas Semanales</Text>
         </TouchableOpacity>
@@ -92,46 +85,48 @@ const App = ({ navigation }: Props) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
+  container: { flex: 1, backgroundColor: '#f8f9fa' },
   topBar: {
     height: 60,
     backgroundColor: '#007bff',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  topBarText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  scrollContent: {
-    flex: 1,
-    padding: 20,
-  },
-  section: {
-    marginBottom: 20,
-  },
+  topBarText: { color: '#fff', fontSize: 20, fontWeight: 'bold' },
+  scrollContent: { flex: 1, padding: 20 },
+  section: { marginBottom: 20 },
   sectionTitle: {
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 10,
     color: '#007bff',
+    textAlign: 'center',
   },
-  sectionText: {
+  sectionText: { fontSize: 16, color: '#333', textAlign: 'center' },
+  goalItem: {
     fontSize: 16,
-    color: '#333',
+    color: '#000',
+    marginBottom: 6,
+    marginLeft: 10,
+  },
+  goalsList: {
+    marginTop: 10,
   },
   imageScroll: {
     marginBottom: 10,
+    maxHeight: 300,
+    alignSelf: 'center',
   },
-  image: {
-    width: 150,
-    height: 150,
-    marginRight: 10,
-    borderRadius: 10,
+  imageScrollContent: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+  },
+  largeImage: {
+    width: 250,
+    height: 250,
+    marginRight: 15,
+    borderRadius: 15,
   },
   bottomBar: {
     height: 60,
@@ -140,13 +135,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
   },
-  bottomBarButton: {
-    padding: 10,
-  },
-  bottomBarText: {
-    color: '#fff',
-    fontSize: 16,
-  },
+  bottomBarButton: { padding: 10 },
+  bottomBarText: { color: '#fff', fontSize: 16 },
 });
 
-export default App;
+export default Home;
